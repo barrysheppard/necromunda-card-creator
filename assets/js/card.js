@@ -50,7 +50,7 @@ function printAtWordWrap(context, text, x, y, lineHeight, fitWidth) {
 
 
 
-function splitWordWrap(context, text, x, y, lineHeight, fitWidth) {
+function splitWordWrap(context, text, fitWidth) {
     // this was modified from the print version to only return the text array
     return_array = [];
     var lines = text.split('\n');
@@ -59,7 +59,6 @@ function splitWordWrap(context, text, x, y, lineHeight, fitWidth) {
         fitWidth = fitWidth || 0;
         if (fitWidth <= 0) {
             return_array.push(lines[i]);
-            //context.fillText(lines[i], x, y + (lineNum * lineHeight));
             lineNum++;
         }
         var words = lines[i].split(' ');
@@ -71,7 +70,6 @@ function splitWordWrap(context, text, x, y, lineHeight, fitWidth) {
                 if (idx == 1) {
                     idx = 2;
                 }
-                //context.fillText(words.slice(0, idx - 1).join(' '), x, y + (lineNum * lineHeight));
                 return_array.push(words.slice(0, idx - 1).join(' '));
                 lineNum++;
                 words = words.splice(idx - 1);
@@ -82,7 +80,6 @@ function splitWordWrap(context, text, x, y, lineHeight, fitWidth) {
             }
         }
         if (idx > 0) {
-            //context.fillText(words.join(' '), x, y + (lineNum * lineHeight));
             return_array.push(words.join(' '));
             lineNum++;
         }
@@ -92,7 +89,7 @@ function splitWordWrap(context, text, x, y, lineHeight, fitWidth) {
 }
 
 
-function printWithMarkup(context, text_array, x, y, lineHeight, fitWidth) {
+function printWithMarkup(context, text_array, x, y, lineHeight) {
 
     // table code style --> font style
 
@@ -159,7 +156,7 @@ drawCardElementFromInputId = function (inputId, pixelPosition) {
     drawCardElementFromInput(document.getElementById(inputId), pixelPosition);
 }
 
-drawFighterName = function (value) {
+drawCardName = function (value) {
     getContext().font = '90px built-titling';
     getContext().fillStyle = 'white';
     getContext().textAlign = "center";
@@ -167,7 +164,7 @@ drawFighterName = function (value) {
     writeScaled(value, { x: getCanvas().width / 2, y: 135 });
 }
 
-drawFighterName2 = function (value) {
+drawFooter = function (value) {
     getContext().font = '50px bank-gothic';
     getContext().fillStyle = '#5B150F';
     getContext().textAlign = "center";
@@ -189,9 +186,9 @@ drawCardText = function (value) {
     //    printAtWordWrap(getContext(), value, getCanvas().width / 2, 280, lineHeight, fitWidth);
 
     // Trying to get a bold and italic check going
-    text_array = (splitWordWrap(getContext(), value, getCanvas().width / 2, 280, lineHeight, fitWidth));
+    text_array = (splitWordWrap(getContext(), value, fitWidth));
 
-    printWithMarkup(getContext(), text_array, getCanvas().width / 2, 280, lineHeight, fitWidth);
+    printWithMarkup(getContext(), text_array, getCanvas().width / 2, 280, lineHeight);
 
 
 
@@ -250,12 +247,12 @@ function setSelectedRunemark(radioDiv, runemark, radioGroupName, bgColor) {
 }
 
 
-function getSelectedDeploymentRunemark() {
-    return getSelectedRunemark($('#deploymentRunemarkSelect')[0]);
+function getSelectedGangLogo() {
+    return getSelectedRunemark($('#gangLogoSelect')[0]);
 }
 
-function setSelectedDeploymentRunemark(runemark) {
-    setSelectedRunemark($('#deploymentRunemarkSelect')[0], runemark, "deployment", "white");
+function setSelectedGangLogo(runemark) {
+    setSelectedRunemark($('#gangLogoSelect')[0], runemark, "deployment", "white");
 }
 
 function drawImage(scaledPosition, scaledSize, image) {
@@ -296,7 +293,7 @@ function drawModel(imageUrl, imageProps) {
 
 function getName() {
     //var textInput = $("#saveNameInput")[0];
-    return "Default";
+    return "Necromunda_Card";
 }
 
 function setName(name) {
@@ -453,16 +450,13 @@ function setSelectedTagRunemarks(selectedRunemarksArray) {
 function readControls() {
     var data = new Object;
     data.name = getName();
-    data.deploymentRunemark = getSelectedDeploymentRunemark();
-    data.fighterName = document.getElementById("fighterName").value;
-    data.fighterName2 = document.getElementById("fighterName2").value;
+    data.gangLogo = getSelectedGangLogo();
+    data.cardName = document.getElementById("cardName").value;
+    data.footer = document.getElementById("footer").value;
     data.cardText = document.getElementById("cardText").value;
 
     return data;
 }
-
-
-
 
 render = function (fighterData) {
 
@@ -471,11 +465,11 @@ render = function (fighterData) {
 
     // Next if selected the icon
     if (!(document.getElementById('checkbox-assets/img/blank2.gif').checked)) {
-        if (fighterData.deploymentRunemark != null) {
+        if (fighterData.gangLogo != null) {
 
             var scaledPosition = scalePixelPosition({ x: 330, y: 760 });
             var scaledSize = scalePixelPosition({ x: 650, y: 650 });
-            var imageSrc = fighterData.deploymentRunemark;
+            var imageSrc = fighterData.gangLogo;
 
             if (imageSrc != null) {
                 var image = new Image();
@@ -485,8 +479,8 @@ render = function (fighterData) {
                     getContext().globalAlpha = 1;
                     getContext().drawImage(document.getElementById('bg2'), 0, 0, getCanvas().width, getCanvas().height);
                     // Name now covered so printed again
-                    drawFighterName(fighterData.fighterName);
-                    drawFighterName2(fighterData.fighterName2);
+                    drawCardName(fighterData.cardName);
+                    drawFooter(fighterData.footer);
                     drawCardText(fighterData.cardText);
                 };
                 image.src = imageSrc;
@@ -496,8 +490,8 @@ render = function (fighterData) {
             // next the frame elements
             getContext().drawImage(document.getElementById('bg2'), 0, 0, getCanvas().width, getCanvas().height);
 
-            drawFighterName(fighterData.fighterName);
-            drawFighterName2(fighterData.fighterName2);
+            drawCardName(fighterData.cardName);
+            drawFooter(fighterData.footer);
 
             drawCardText(fighterData.cardText);
         }
@@ -505,23 +499,18 @@ render = function (fighterData) {
         // next the frame elements
         getContext().drawImage(document.getElementById('bg2'), 0, 0, getCanvas().width, getCanvas().height);
 
-        drawFighterName(fighterData.fighterName);
-        drawFighterName2(fighterData.fighterName2);
+        drawCardName(fighterData.cardName);
+        drawFooter(fighterData.footer);
 
         drawCardText(fighterData.cardText);
     }
-
-
-
-
-
 }
 
 function writeControls(fighterData) {
     setName(fighterData.name);
-    setSelectedDeploymentRunemark(fighterData.deploymentRunemark);
-    $("#fighterName")[0].value = fighterData.fighterName;
-    $("#fighterName2")[0].value = fighterData.fighterName2;
+    setSelectedGangLogo(fighterData.gangLogo);
+    $("#cardName")[0].value = fighterData.cardName;
+    $("#footer")[0].value = fighterData.footer;
     $("#cardText")[0].value = fighterData.cardText;
 
 }
@@ -529,10 +518,10 @@ function writeControls(fighterData) {
 function defaultFighterData() {
     var fighterData = new Object;
     fighterData.name = 'Default';
-    fighterData.fighterName = "Name";
-    fighterData.fighterName2 = "subtitle";
+    fighterData.cardName = "Name";
+    fighterData.footer = "subtitle";
     fighterData.cardText = "Card Text";
-    fighterData.deploymentRunemark = null;
+    fighterData.gangLogo = null;
 
 
     return fighterData;
@@ -549,20 +538,20 @@ function loadFighterDataMap() {
     }
     // Set up the map.
     var map = new Object;
-    map["Default"] = defaultFighterData();
+    map["Necromunda_Card"] = defaultFighterData();
     saveFighterDataMap(map);
     return map;
 }
 
 function loadLatestFighterData() {
-    var latestFighterName = window.localStorage.getItem("latestFighterName");
-    if (latestFighterName == null) {
-        latestFighterName = "Default";
+    var latestCardName = window.localStorage.getItem("latestCardName");
+    if (latestCardName == null) {
+        latestCardName = "Necromunda_Card";
     }
 
-    console.log("Loading '" + latestFighterName + "'...");
+    console.log("Loading '" + latestCardName + "'...");
 
-    var data = loadFighterData(latestFighterName);
+    var data = loadFighterData(latestCardName);
 
     if (data) {
         console.log("Loaded data:");
@@ -581,7 +570,7 @@ function saveLatestFighterData() {
         return;
     }
 
-    window.localStorage.setItem("latestFighterName", fighterData.name);
+    window.localStorage.setItem("latestCardName", fighterData.name);
     saveFighterData(fighterData);
 }
 
@@ -647,7 +636,7 @@ async function saveFighterData(fighterData) {
     if (fighterData != null &&
         fighterData.name) {
         // handle images we may have loaded from disk...
-        fighterData.deploymentRunemark = await handleImageUrlFromDisk(fighterData.deploymentRunemark);
+        fighterData.gangLogo = await handleImageUrlFromDisk(fighterData.gangLogo);
 
         finishSaving();
     }
@@ -671,7 +660,7 @@ onAnyChange = function () {
     saveLatestFighterData();
 }
 
-onDeploymentRunemarkSelectionChanged = function (radioButton, backgroundColor) {
+onGangLogoSelectionChanged = function (radioButton, backgroundColor) {
     var radioSection = radioButton.parentNode.parentNode;
     var allRadioButtons = $('input', radioSection);
     for (i = 0; i < allRadioButtons.length; i++) {
@@ -684,9 +673,9 @@ onDeploymentRunemarkSelectionChanged = function (radioButton, backgroundColor) {
     onAnyChange();
 }
 
-onDeploymentRunemarkFileSelect = function () {
+onGangLogoFileSelect = function () {
     var imageSelect = $("#additionalDeploymentMarkSelect")[0];
-    var selectGrid = $("#deploymentRunemarkSelect")[0];
+    var selectGrid = $("#gangLogoSelect")[0];
 
     for (i = 0; i < imageSelect.files.length; i++) {
         addToImageRadioSelector(URL.createObjectURL(imageSelect.files[i]), selectGrid, "deployment", "black");
@@ -750,8 +739,8 @@ async function onSaveClicked() {
     // temp null while I work out image saving
     data.imageUrl = null;
     // need to be explicit due to sub arrays
-    var exportObj = JSON.stringify(data, ['name', 'deploymentRunemark', 'fighterName', 'fighterName2', 'cardText'], 4);
-    var exportName = data.fighterName;
+    var exportObj = JSON.stringify(data, ['name', 'cardName', 'cardText', 'footer', 'gangLogo',], 4);
+    var exportName = data.cardName;
 
     var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(exportObj);
     var downloadAnchorNode = document.createElement('a');
@@ -766,7 +755,7 @@ function saveCardAsImage() {
     var element = document.createElement('a');
     data = readControls();
     element.setAttribute('href', document.getElementById('canvas').toDataURL('image/png'));
-    element.setAttribute('download', "necromunda_card_" + data.fighterName + ".png");
+    element.setAttribute('download', "necromunda_card_" + data.cardName + ".png");
     element.style.display = 'none';
     document.body.appendChild(element);
     element.click();
@@ -809,7 +798,3 @@ async function fileChange(file) {
         render(json)
     );
 }
-
-
-
-
