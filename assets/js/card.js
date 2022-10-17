@@ -8,8 +8,6 @@ writeValue = function (ctx, value, pos) {
     ctx.restore();
 }
 
-
-
 function printAtWordWrap(context, text, x, y, lineHeight, fitWidth) {
 
     var lines = text.split('\n');
@@ -517,10 +515,10 @@ function writeControls(fighterData) {
 
 function defaultFighterData() {
     var fighterData = new Object;
-    fighterData.name = 'Default';
-    fighterData.cardName = "Name";
-    fighterData.footer = "subtitle";
-    fighterData.cardText = "Card Text";
+    fighterData.name = "Necromunda_Card";
+    fighterData.cardName = "Card Name";
+    fighterData.footer = "Footer";
+    fighterData.cardText = "Body Text\n\n**Text starting with ** is red";
     fighterData.gangLogo = null;
 
 
@@ -558,7 +556,8 @@ function loadLatestFighterData() {
         console.log(data);
     }
     else {
-        console.log("Failed to load a fighter data.");
+        console.log("Failed to load data, loading defaults.");
+        data = defaultFighterData();
     }
 
     return data;
