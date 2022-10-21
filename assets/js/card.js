@@ -159,7 +159,7 @@ drawCardName = function (value) {
     getContext().fillStyle = 'white';
     getContext().textAlign = "center";
     getContext().textBaseline = "middle";
-    writeScaled(value, { x: getCanvas().width / 2, y: 135 });
+    writeScaled(value, { x: getCanvas().width / 2, y: 165 });
 }
 
 drawFooter = function (value) {
@@ -167,7 +167,7 @@ drawFooter = function (value) {
     getContext().fillStyle = '#5B150F';
     getContext().textAlign = "center";
     getContext().textBaseline = "middle";
-    writeScaled(value, { x: getCanvas().width / 2, y: 1230 });
+    writeScaled(value, { x: getCanvas().width / 2, y: 1245 });
 }
 
 drawCardText = function (value) {
@@ -466,7 +466,7 @@ render = function (fighterData) {
         if (fighterData.gangLogo != null) {
 
             var scaledPosition = scalePixelPosition({ x: 330, y: 760 });
-            var scaledSize = scalePixelPosition({ x: 650, y: 650 });
+            var scaledSize = scalePixelPosition({ x: 680, y: 680 });
             var imageSrc = fighterData.gangLogo;
 
             if (imageSrc != null) {
