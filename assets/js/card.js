@@ -170,26 +170,42 @@ drawFooter = function (value) {
     writeScaled(value, { x: getCanvas().width / 2, y: 1245 });
 }
 
-drawCardText = function (value) {
-
-    getContext().font = '36px frutiger-light';
-    getContext().fillStyle = 'black';
-    getContext().textAlign = "center";
-    getContext().textBaseline = "middle";
-
-    lineHeight = 50;
-    fitWidth = 800;
+function drawCardText(value) {
+    const ctx = getContext();
+    const canvas = getCanvas();
+    const topY = 280;
+    const footerY = 1205;
+    let fontSize = 36;
+    let lineHeight = 50;
+    let fitWidth = 800;
+    let text_array;
+    let totalHeight;
 
     // This one works, commented out for testing
     //    printAtWordWrap(getContext(), value, getCanvas().width / 2, 280, lineHeight, fitWidth);
 
-    // Trying to get a bold and italic check going
-    text_array = (splitWordWrap(getContext(), value, fitWidth));
+    // If the content exceeds the footer, reduce font size until it fits to a minimum of 18px
+    do {
+        ctx.font = `${fontSize}px frutiger-light`;
+        ctx.fillStyle = 'black';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        lineHeight = Math.round(fontSize * 1.4);
 
-    printWithMarkup(getContext(), text_array, getCanvas().width / 2, 280, lineHeight);
+        // Trying to get a bold and italic check going
+        text_array = splitWordWrap(ctx, value, fitWidth);
+        totalHeight = text_array.length * lineHeight;
 
+        // If text would go past the footer, reduce font size
+        if (topY + totalHeight > footerY - fontSize) {
+            fontSize -= 1; // Reduce font size by 1px
+            if (fontSize < 18) break; // Set a minimum font size
+        } else {
+            break;
+        }
+    } while (true);
 
-
+    printWithMarkup(ctx, text_array, canvas.width / 2, topY, lineHeight);
 }
 
 function getLabel(element) {
